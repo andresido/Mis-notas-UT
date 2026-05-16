@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UT - Ing. Sistemas</title>
+    <style>
+        :root {
+            --ut-red: #8B1D24;
+            /* Carmín/Vino tinto UT */
+            --ut-red-light: #AA2B33;
+            --ut-dark: #2D2D2D;
+            --ut-gray: #E0E0E0;
+            --ut-light: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #2E7D32;
+            --warning: #F57F17;
+            --danger: #C62828;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--ut-light);
+            color: var(--ut-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- UI Elements --- */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--ut-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--ut-red-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 29, 36, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--ut-gray);
+            color: var(--ut-dark);
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--ut-red);
+        }
+
+        /* --- Login Screen --- */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--ut-red) 0%, #4a0f13 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .login-card h1 {
+            color: var(--ut-red);
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        #login-error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* --- Main App --- */
+        #app-screen {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 18px;
+            color: var(--ut-red);
+            font-weight: 800;
+        }
+
+        header .logout-btn {
+            background: transparent;
+            border: 1px solid var(--ut-red);
+            color: var(--ut-red);
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .semester-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--ut-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .semester-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .semester-card.has-data {
+            border-left-color: var(--ut-red);
+        }
+
+        .semester-card.approved {
+            border-left-color: var(--success);
+        }
+
+        .semester-card h2 {
+            font-size: 22px;
+            color: var(--ut-dark);
+            margin-bottom: 10px;
+        }
+
+        .semester-card p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .semester-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .status-empty {
+            background: #f0f0f0;
+            color: #888;
+        }
+
+        .status-progress {
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
+        .status-approved {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        /* --- Semester View --- */
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            background: var(--white);
+            padding: 8px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+        }
+
+        .subjects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .subject-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-left: 4px solid var(--ut-red);
+        }
+
+        .subject-card:hover {
+            transform: scale(1.01);
+        }
+
+        .subject-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .subject-grade {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .grade-pass {
+            color: var(--success);
+        }
+
+        .grade-fail {
+            color: var(--danger);
+        }
+
+        .grade-none {
+            color: #999;
+        }
+
+        .delete-subject-btn {
+            background: transparent;
+            color: var(--danger);
+            padding: 5px;
+            font-size: 20px;
+        }
+
+        .add-subject-wrapper {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* --- Modal (Subject Detail) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeInOverlay 0.3s;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px 20px 0 0;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @media(min-width: 600px) {
+            .modal-overlay {
+                align-items: center;
+            }
+
+            .modal-content {
+                border-radius: 20px;
+                max-height: 85vh;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ut-red);
+            padding-right: 40px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 10px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #777;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--ut-red);
+            border-bottom-color: var(--ut-red);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- Grades Module --- */
+        .grades-section {
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .grades-section h4 {
+            margin-bottom: 15px;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .grade-pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .grade-pill {
+            background: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 140px;
+        }
+
+        .grade-pill input {
+            width: 60px;
+            margin: 0;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            border-color: #eee;
+        }
+
+        .grade-pill .del-note {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .prediction-box {
+            background: linear-gradient(135deg, var(--ut-red), #6d151c);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .prediction-box .final-grade {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .prediction-box .alert-msg {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* --- Calendar Pro --- */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-name {
+            font-weight: bold;
+            font-size: 12px;
+            color: #888;
+            padding: 5px 0;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .day-cell.saturday {
+            color: var(--ut-red);
+            font-weight: bold;
+            background: #ffeeee;
+        }
+
+        .day-cell.tutoria {
+            background: var(--warning);
+            color: white;
+            box-shadow: 0 2px 5px rgba(245, 127, 23, 0.4);
+        }
+
+        .day-cell.examen {
+            background: var(--ut-red);
+            color: white;
+            box-shadow: 0 2px 5px rgba(139, 29, 36, 0.4);
+        }
+
+        .day-cell.empty {
+            background: transparent;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .date-list {
+            margin-bottom: 15px;
+        }
+
+        .date-chip {
+            display: inline-block;
+            background: #eee;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .date-chip span {
+            cursor: pointer;
+            color: var(--danger);
+            margin-left: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1>UT Académico</h1>
+            <p>Ingeniería de Sistemas - CAT Cali</p>
+            <div id="login-error">Credenciales incorrectas</div>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Usuario" required autocomplete="username">
+                <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
+                <button id="btn-login-submit" type="submit" class="btn btn-primary" style="width: 100%;">Iniciar
+                    Sesión</button>
+            </form>
+            <div id="login-loading" style="display: none; margin-top: 20px; color: #666; font-size: 14px;">
+                Cargando datos desde la nube... ☁️
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-screen">
+        <header>
+            <h1>INGENIERO EN SISTEMAS</h1>
+            <button class="btn logout-btn" id="logout-btn">Salir</button>
+        </header>
+
+        <!-- DASHBOARD (9 Semestres) -->
+        <main id="dashboard-view" class="view">
+            <div class="dashboard-grid" id="semesters-grid">
+                <!-- Generado por JS -->
+            </div>
+        </main>
+
+        <!-- SEMESTER DETAIL VIEW -->
+        <main id="semester-view" class="view">
+            <div class="back-header">
+                <button class="btn back-btn" id="back-to-dash">⬅</button>
+                <h2 id="semester-title">Semestre</h2>
+            </div>
+            <div class="subjects-list" id="subjects-list">
+                <!-- Generado por JS -->
+            </div>
+            <div class="add-subject-wrapper">
+                <button class="btn btn-secondary" id="btn-add-subject">+ Añadir Materia Extra</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- SUBJECT MODAL -->
+    <div class="modal-overlay" id="subject-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-subject-title">Materia</div>
+                <button class="close-modal" id="close-modal">✕</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-target="tab-info">Información</button>
+                <button class="tab-btn" data-target="tab-grades">Calificaciones</button>
+                <button class="tab-btn" data-target="tab-calendar">Calendario Pro</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- TAB: INFO -->
+                <div id="tab-info" class="tab-content active">
+                    <label>Nombre de Materia</label>
+                    <input type="text" id="inp-sub-name">
+
+                    <label>Docente</label>
+                    <input type="text" id="inp-sub-teacher" placeholder="Nombre del docente">
+
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="inp-sub-email" placeholder="correo@ut.edu.co">
+
+                    <label>Salón</label>
+                    <input type="text" id="inp-sub-room" placeholder="Ej. 03 - 205 o Biblioteca">
+
+                    <label>Jornada (Sábados)</label>
+                    <select id="inp-sub-shift">
+                        <option value="Sábado 1">Sábado 1 (Semanas impares)</option>
+                        <option value="Sábado 2">Sábado 2 (Semanas pares)</option>
+                        <option value="Todos">Todos los Sábados</option>
+                    </select>
+
+                    <button class="btn btn-primary" id="btn-save-info" style="width:100%">Guardar Información</button>
+                </div>
+
+                <!-- TAB: GRADES -->
+                <div id="tab-grades" class="tab-content">
+                    <div class="grades-section">
+                        <h4>Tutorías (60%) <span id="tuto-avg-display">0.00</span></h4>
+                        <div class="grade-pill-container" id="tuto-container">
+                            <!-- JS gen -->
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="btn-add-note"
+                            style="font-size: 12px; padding: 5px 10px;">+ Nota</button>
+                    </div>
+
+                    <div class="grades-section">
+                        <h4>Examen Convocatoria I (40%)</h4>
+                        <input type="number" id="inp-exam-grade" step="0.1" min="0" max="5"
+                            placeholder="Nota de examen">
+                    </div>
+
+                    <div class="prediction-box">
+                        <div style="font-size: 14px; opacity: 0.9;">Nota Final Proyectada</div>
+                        <div class="final-grade" id="display-final-grade">0.00</div>
+                        <div class="alert-msg" id="display-prediction">Agrega notas para calcular.</div>
+                    </div>
+                </div>
+
+                <!-- TAB: CALENDAR -->
+                <div id="tab-calendar" class="tab-content">
+                    <div style="margin-bottom: 20px;">
+                        <label>Añadir Fecha de Tutoría</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="date" id="inp-new-tuto-date" style="margin-bottom: 0;">
+                            <button class="btn btn-secondary" id="btn-add-date">Añadir</button>
+                        </div>
+                        <div class="date-list" id="tuto-dates-list" style="margin-top: 10px;"></div>
+
+                        <label style="margin-top:15px; display:block;">Fecha Examen Final (Convocatoria I)</label>
+                        <input type="date" id="inp-exam-date">
+                    </div>
+
+                    <div style="border: 1px solid #eee; border-radius: 12px; padding: 15px;">
+                        <div class="calendar-header">
+                            <button class="btn btn-secondary" id="cal-prev" style="padding: 5px 10px;">&lt;</button>
+                            <div id="cal-month-year" style="font-weight: bold;">Mes Año</div>
+                            <button class="btn btn-secondary" id="cal-next" style="padding: 5px 10px;">&gt;</button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="day-name">Do</div>
+                            <div class="day-name">Lu</div>
+                            <div class="day-name">Ma</div>
+                            <div class="day-name">Mi</div>
+                            <div class="day-name">Ju</div>
+                            <div class="day-name">Vi</div>
+                            <div class="day-name">Sa</div>
+                        </div>
+                        <div class="calendar-grid" id="calendar-days">
+                            <!-- JS Gen -->
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background:#ffeeee; border: 1px solid var(--ut-red);">
+                                </div> Sábado
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background:var(--warning);"></div> Tutoría
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background:var(--ut-red);"></div> Examen
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Compat Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLgwJ0Bcd0GpgVtzmK8S5a0c58Zmhc19o",
+            authDomain: "notas-ut.firebaseapp.com",
+            projectId: "notas-ut",
+            storageBucket: "notas-ut.firebasestorage.app",
+            messagingSenderId: "608162169192",
+            appId: "1:608162169192:web:93aa3bfc7619ce888316dd"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- DATA MASTER (MALLA CURRICULAR 0854 Plan I) ---
+        const PENSUM = {
+            1: ["Lectura y Escritura", "Seminario Permanente de Autoformación", "Introducción a los Sistemas", "Lógica de Sistemas", "Álgebra Lineal", "Pre-Cálculo"],
+            2: [
+                { name: "Elementos de Programación Orientada a Objetos", teacher: "MORAN GUERRERO WILSON ALEXANDER", email: "wamorang@ut.edu.co", room: "Biblioteca", shift: "Sábado 1", tutoDates: ["2026-03-21", "2026-04-11", "2026-04-25", "2026-05-09", "2026-05-30"], examDate: "2026-06-13" },
+                { name: "Cálculo I", teacher: "PAZ HURTADO ELVIS", email: "epazh@ut.edu.co", room: "03 - 205", shift: "Sábado 1", tutoDates: ["2026-03-21", "2026-04-11", "2026-04-25", "2026-05-09", "2026-05-30"], examDate: "2026-06-13" },
+                { name: "Teoría de Sistemas", teacher: "ARAUJO MUÑOZ LEWIS ARGEMIRO", email: "learaujom@ut.edu.co", room: "SALA SISTEMAS 02 - 102", shift: "Sábado 1", tutoDates: ["2026-03-21", "2026-04-11", "2026-04-25", "2026-05-09", "2026-05-30"], examDate: "2026-06-13" },
+                { name: "Estadística I", teacher: "POVEDA CENDALES MARÍA ISABEL", email: "mipovedac@ut.edu.co", room: "04 - 103", shift: "Sábado 2", tutoDates: ["2026-03-28", "2026-04-18", "2026-05-02", "2026-05-23", "2026-06-06"], examDate: "2026-06-20" },
+                { name: "Ética Profesional", teacher: "HURTADO OSPINA DANIEL", email: "dahurtadoo@ut.edu.co", room: "07 - 202", shift: "Sábado 2", tutoDates: ["2026-03-28", "2026-04-18", "2026-05-02", "2026-05-23", "2026-06-06"], examDate: "2026-06-20" },
+                { name: "Inglés I", teacher: "RAMIREZ GOMEZ LINDA EVELIN", email: "leramirezg@ut.edu.co", room: "06 - 203", shift: "Sábado 2", tutoDates: ["2026-03-28", "2026-04-18", "2026-05-02", "2026-05-23", "2026-06-06"], examDate: "2026-06-20" }
+            ],
+            3: ["Gestión de Información", "Programación O.O. II", "Metodología de Diseño de Software", "Cálculo II", "Estadística II", "Inglés II"],
+            4: ["Ingeniería de Software", "Programación O.O. III", "Sistemas Operativos", "Constitución Política", "Cálculo III", "Física I", "Inglés III"],
+            5: ["Formación para la Investigación I", "Programación O.O. IV", "Diseño de Redes", "Ecuaciones Diferenciales", "Matemáticas Discretas", "Electiva I"],
+            6: ["Formación para la Investigación II", "Arquitectura de Software", "Minería de Datos", "Procesos Administrativos", "Métodos Numéricos", "Física II"],
+            7: ["Formación para la Investigación III", "Aprendizaje Automático I", "Análisis de Datos a Gran Escala", "Modelos del Conocimiento", "Elementos Financieros", "Electiva II"],
+            8: ["Calidad de Software", "Inteligencia de Negocios", "Ingeniería Legal", "Investigación de Operaciones", "Taller de Gerencia de Proyectos", "Optativa I"],
+            9: ["Gerencia de TI", "Auditoría de Sistemas de Información", "Seguridad de la Información", "Aprendizaje Automático II", "Modelos y Simulación", "Optativa II", "Optativa III"]
+        };
+
+        // --- ESTADO (STATE MANAGEMENT) ---
+        const STORAGE_KEY = 'ut_academico_v6';
+        let appState = {
+            semesters: {} // { 1: { subjects: [ {id, name, teacher, room, shift, tutos:[0,0,0,0,0], exam: 0, tutoDates:[], examDate:''} ] } }
+        };
+        let currentSemester = null;
+        let currentSubjectId = null;
+        let calCurrentDate = new Date();
+
+        function createDefaultState() {
+            const newState = { semesters: {} };
+            for (let i = 1; i <= 9; i++) {
+                newState.semesters[i] = { initialized: false, subjects: [] };
+            }
+            // Dejamos que el semestre 2 se inicialice mediante la lógica estándar
+            // al hacer clic por primera vez, garantizando que tenga IDs.
+            return newState;
+        }
+
+        // --- INICIALIZACIÓN ---
+        function init() {
+            if (sessionStorage.getItem('ut_logged_in') === 'true') {
+                loadFromFirebaseAndShowApp();
+            }
+        }
+
+        function saveState() {
+            // Guardado local
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+
+            // Guardado en Firestore
+            db.collection('userdata').doc('andresido').set(appState)
+                .catch(err => console.error("Error guardando en Firebase:", err));
+
+            if (currentSemester) renderSemesterView(currentSemester); // Refresh list
+            renderDashboard(); // Refresh dash statuses
+        }
+
+        async function loadFromFirebaseAndShowApp() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('login-loading').style.display = 'block';
+
+            try {
+                const docRef = db.collection('userdata').doc('andresido');
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    appState = docSnap.data();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                } else {
+                    appState = createDefaultState();
+                    await docRef.set(appState);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                }
+                document.getElementById('login-loading').style.display = 'none';
+                showApp();
+            } catch (error) {
+                console.error("Error al cargar desde Firebase:", error);
+                document.getElementById('login-loading').style.display = 'none';
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    appState = JSON.parse(saved);
+                } else {
+                    appState = createDefaultState();
+                }
+                showApp();
+            }
+        }
+
+        function generateId() { return Math.random().toString(36).substr(2, 9); }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            if (u === 'andresido' && p === '7766') {
+                sessionStorage.setItem('ut_logged_in', 'true');
+                loadFromFirebaseAndShowApp();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('ut_logged_in');
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('login-loading').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        });
+
+        function showApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'flex';
+            renderDashboard();
+            switchView('dashboard-view');
+        }
+
+        // --- NAVEGACIÓN ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        document.getElementById('back-to-dash').addEventListener('click', () => {
+            currentSemester = null;
+            switchView('dashboard-view');
+        });
+
+        // --- DOM RENDER: DASHBOARD ---
+        function renderDashboard() {
+            const grid = document.getElementById('semesters-grid');
+            grid.innerHTML = '';
+
+            for (let i = 1; i <= 9; i++) {
+                const semData = appState.semesters[i];
+
+                let statusClass = 'status-empty';
+                let statusText = 'Sin configurar';
+                let hasDataClass = '';
+
+                if (semData.initialized) {
+                    hasDataClass = 'has-data';
+                    const subjects = semData.subjects;
+                    const allApproved = subjects.length > 0 && subjects.every(sub => calculateSubjectFinal(sub).final >= 3.0);
+                    if (allApproved) {
+                        statusClass = 'status-approved';
+                        statusText = 'Aprobado';
+                        hasDataClass += ' approved';
+                    } else {
+                        statusClass = 'status-progress';
+                        statusText = 'En curso';
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = `semester-card ${hasDataClass}`;
+                card.innerHTML = `
+                    <div class="semester-status ${statusClass}">${statusText}</div>
+                    <h2>Semestre ${romanize(i)}</h2>
+                    <p>${semData.initialized ? (semData.subjects || []).length + ' materias' : 'Clic para iniciar'}</p>
+                `;
+                card.addEventListener('click', () => openSemester(i));
+                grid.appendChild(card);
+            }
+        }
+
+        function romanize(num) {
+            const lookup = [
+                ['M', 1000], ['CM', 900], ['D', 500], ['CD', 400],
+                ['C', 100], ['XC', 90], ['L', 50], ['XL', 40],
+                ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]
+            ];
+            let roman = '';
+            for (const [letter, value] of lookup) {
+                while (num >= value) { roman += letter; num -= value; }
+            }
+            return roman;
+        }
+
+        // --- DOM RENDER: SEMESTER VIEW ---
+        function openSemester(semNum) {
+            currentSemester = semNum;
+            document.getElementById('semester-title').textContent = `Semestre ${romanize(semNum)}`;
+
+            if (!appState.semesters[semNum].initialized) {
+                // Populate from pensum
+                const subjects = PENSUM[semNum] || [];
+                appState.semesters[semNum].subjects = subjects.map(item => {
+                    if (typeof item === 'string') return createNewSubjectObj(item);
+                    return { ...createNewSubjectObj(item.name), ...item };
+                });
+                appState.semesters[semNum].initialized = true;
+                saveState(); // will trigger render
+            } else {
+                // Reparación: Si las materias existen pero no tienen ID (caso Semestre 2 previo)
+                let needsRepair = false;
+                appState.semesters[semNum].subjects = appState.semesters[semNum].subjects.map(sub => {
+                    if (!sub.id) {
+                        needsRepair = true;
+                        return { ...createNewSubjectObj(sub.name || 'Materia'), ...sub };
+                    }
+                    return sub;
+                });
+                if (needsRepair) saveState();
+                renderSemesterView(semNum);
+            }
+
+            switchView('semester-view');
+        }
+
+        function createNewSubjectObj(name) {
+            return {
+                id: generateId(), name: name, teacher: '', email: '', room: '', shift: 'Sábado 1',
+                tutos: [0, 0, 0, 0, 0], exam: 0, tutoDates: [], examDate: ''
+            };
+        }
+
+        function calculateSubjectFinal(sub) {
+            const tutos = sub.tutos || [];
+            const validTutos = tutos.map(t => parseFloat(t) || 0);
+            const sumTutos = validTutos.reduce((a, b) => a + b, 0);
+            const avgTutos = validTutos.length > 0 ? sumTutos / validTutos.length : 0;
+            const final = (avgTutos * 0.6) + ((parseFloat(sub.exam) || 0) * 0.4);
+            return { avgTutos, final };
+        }
+
+        function renderSemesterView(semNum) {
+            if (currentSemester !== semNum) return;
+            const list = document.getElementById('subjects-list');
+            list.innerHTML = '';
+
+            const subjects = appState.semesters[semNum].subjects;
+            subjects.forEach(sub => {
+                const { final } = calculateSubjectFinal(sub);
+                let gradeClass = 'grade-none';
+                if (final > 0) gradeClass = final >= 3.0 ? 'grade-pass' : 'grade-fail';
+
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.addEventListener('click', () => openSubjectModal(sub.id));
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h3 style="margin-bottom: 8px; font-size: 16px;">${sub.name}</h3>
+                        <button class="delete-subject-btn" onclick="deleteSubject('${sub.id}', event)">✕</button>
+                    </div>
+                    <div style="font-size: 13px; color: #555; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <div><strong>Docente:</strong> ${sub.teacher || '--'}</div>
+                        <div><strong>Salón:</strong> ${sub.room || '--'}</div>
+                        <div><strong>Jornada:</strong> ${sub.shift || '--'}</div>
+                        <div><strong>Examen:</strong> ${sub.examDate || '--'}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px;">
+                        <div style="font-size: 13px;">
+                            <strong>Tutorías:</strong> [${(sub.tutos || []).map(t => Number(t) > 0 ? Number(t).toFixed(1) : '-').join(', ')}]
+                            <br>
+                            <strong>Examen 40%:</strong> ${sub.exam > 0 ? Number(sub.exam).toFixed(1) : '--'}
+                        </div>
+                        <div class="subject-grade ${gradeClass}" style="font-size: 24px;">
+                            ${final.toFixed(1)}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        document.getElementById('btn-add-subject').addEventListener('click', () => {
+            const name = prompt("Nombre de la nueva materia:");
+            if (name && name.trim() !== '') {
+                appState.semesters[currentSemester].subjects.push(createNewSubjectObj(name.trim()));
+                saveState();
+            }
+        });
+
+        window.deleteSubject = function (id, e) {
+            e.stopPropagation();
+            if (confirm('¿Eliminar esta materia?')) {
+                appState.semesters[currentSemester].subjects = appState.semesters[currentSemester].subjects.filter(s => s.id !== id);
+                saveState();
+            }
+        }
+
+        // --- SUBJECT MODAL ---
+        function getSubjectById(id) {
+            return appState.semesters[currentSemester].subjects.find(s => s.id === id);
+        }
+
+        window.openSubjectModal = function (id) {
+            currentSubjectId = id;
+            const sub = getSubjectById(id);
+            if (!sub) return;
+
+            document.getElementById('modal-subject-title').textContent = sub.name;
+
+            // Tab Info
+            document.getElementById('inp-sub-name').value = sub.name;
+            document.getElementById('inp-sub-teacher').value = sub.teacher;
+            document.getElementById('inp-sub-email').value = sub.email;
+            document.getElementById('inp-sub-room').value = sub.room;
+            document.getElementById('inp-sub-shift').value = sub.shift;
+
+            // Tab Grades
+            renderGradesUI(sub);
+
+            // Tab Calendar
+            document.getElementById('inp-exam-date').value = sub.examDate;
+            renderTutoDatesList(sub);
+
+            // Reset to info tab
+            document.querySelectorAll('.tab-btn')[0].click();
+            document.getElementById('subject-modal').classList.add('active');
+
+            // Set calendar to exam date or current
+            if (sub.examDate) {
+                calCurrentDate = new Date(sub.examDate + "T12:00:00");
+            } else if (sub.tutoDates.length > 0) {
+                calCurrentDate = new Date(sub.tutoDates[0] + "T12:00:00");
+            } else {
+                calCurrentDate = new Date();
+            }
+            renderCalendar();
+        }
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('subject-modal').classList.remove('active');
+            saveState(); // Save any pending changes on close
+        });
+
+        // Tabs logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.target).classList.add('active');
+                if (e.target.dataset.target === 'tab-calendar') renderCalendar();
+            });
+        });
+
+        // Save info
+        document.getElementById('btn-save-info').addEventListener('click', () => {
+            const sub = getSubjectById(currentSubjectId);
+            sub.name = document.getElementById('inp-sub-name').value;
+            sub.teacher = document.getElementById('inp-sub-teacher').value;
+            sub.email = document.getElementById('inp-sub-email').value;
+            sub.room = document.getElementById('inp-sub-room').value;
+            sub.shift = document.getElementById('inp-sub-shift').value;
+            saveState();
+            document.getElementById('modal-subject-title').textContent = sub.name;
+            alert('Información guardada');
+        });
+
+        // --- GRADES LOGIC ---
+        function renderGradesUI(sub) {
+            const container = document.getElementById('tuto-container');
+            container.innerHTML = '';
+
+            sub.tutos.forEach((val, index) => {
+                const pill = document.createElement('div');
+                pill.className = 'grade-pill';
+                pill.innerHTML = `
+                    <span>T${index + 1}</span>
+                    <input type="number" step="0.1" min="0" max="5" value="${val}" data-idx="${index}">
+                    <span class="del-note" onclick="removeNote(${index})">✕</span>
+                `;
+                container.appendChild(pill);
+            });
+
+            // Add events to inputs
+            container.querySelectorAll('input').forEach(inp => {
+                inp.addEventListener('input', (e) => {
+                    let v = parseFloat(e.target.value);
+                    if (v < 0) v = 0; if (v > 5) v = 5;
+                    sub.tutos[e.target.dataset.idx] = isNaN(v) ? 0 : v;
+                    updatePrediction(sub);
+                });
+            });
+
+            document.getElementById('inp-exam-grade').value = sub.exam;
+
+            updatePrediction(sub);
+        }
+
+        document.getElementById('btn-add-note').addEventListener('click', () => {
+            const sub = getSubjectById(currentSubjectId);
+            sub.tutos.push(0);
+            renderGradesUI(sub);
+            updatePrediction(sub);
+        });
+
+        window.removeNote = function (index) {
+            const sub = getSubjectById(currentSubjectId);
+            if (sub.tutos.length > 1) {
+                sub.tutos.splice(index, 1);
+                renderGradesUI(sub);
+                updatePrediction(sub);
+            } else {
+                alert("Debe haber al menos 1 nota de tutoría.");
+            }
+        }
+
+        document.getElementById('inp-exam-grade').addEventListener('input', (e) => {
+            const sub = getSubjectById(currentSubjectId);
+            let v = parseFloat(e.target.value);
+            if (v < 0) v = 0; if (v > 5) v = 5;
+            sub.exam = isNaN(v) ? 0 : v;
+            updatePrediction(sub);
+        });
+
+        function updatePrediction(sub) {
+            const { avgTutos, final } = calculateSubjectFinal(sub);
+            document.getElementById('tuto-avg-display').textContent = avgTutos.toFixed(2);
+            document.getElementById('display-final-grade').textContent = final.toFixed(2);
+
+            const msgEl = document.getElementById('display-prediction');
+
+            if (final >= 2.95) { // Aproximación estándar
+                msgEl.textContent = "¡Aprobando la materia!";
+                msgEl.style.color = "#a5d6a7";
+            } else {
+                // How much needed in exam (40%) to get 3.0?
+                // 3.0 = (avgTutos * 0.6) + (NeededExam * 0.4)
+                // NeededExam = (3.0 - (avgTutos * 0.6)) / 0.4
+                const needed = Math.max(0, (3.0 - (avgTutos * 0.6)) / 0.4);
+                if (needed > 5.0) {
+                    msgEl.textContent = `Imposible aprobar. Necesitas ${needed.toFixed(2)} en el examen.`;
+                    msgEl.style.color = "#ffcdd2";
+                } else if (needed <= 0) {
+                    msgEl.textContent = "Ya pasaste con el 60%.";
+                    msgEl.style.color = "#a5d6a7";
+                } else {
+                    msgEl.textContent = `Necesitas sacar ${needed.toFixed(2)} en el Examen de Convocatoria para pasar con 3.0.`;
+                    msgEl.style.color = "#fff59d";
+                }
+            }
+        }
+
+        // --- CALENDAR LOGIC ---
+        function renderTutoDatesList(sub) {
+            const list = document.getElementById('tuto-dates-list');
+            list.innerHTML = '';
+            sub.tutoDates.forEach((dateStr, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'date-chip';
+                chip.innerHTML = `${dateStr} <span onclick="removeTutoDate(${idx})">✕</span>`;
+                list.appendChild(chip);
+            });
+        }
+
+        document.getElementById('btn-add-date').addEventListener('click', () => {
+            const val = document.getElementById('inp-new-tuto-date').value;
+            if (!val) return;
+            const sub = getSubjectById(currentSubjectId);
+            if (!sub.tutoDates.includes(val)) {
+                sub.tutoDates.push(val);
+                sub.tutoDates.sort();
+                renderTutoDatesList(sub);
+                renderCalendar();
+                document.getElementById('inp-new-tuto-date').value = '';
+            }
+        });
+
+        window.removeTutoDate = function (idx) {
+            const sub = getSubjectById(currentSubjectId);
+            sub.tutoDates.splice(idx, 1);
+            renderTutoDatesList(sub);
+            renderCalendar();
+        }
+
+        document.getElementById('inp-exam-date').addEventListener('change', (e) => {
+            const sub = getSubjectById(currentSubjectId);
+            sub.examDate = e.target.value;
+            renderCalendar();
+        });
+
+        function renderCalendar() {
+            const sub = getSubjectById(currentSubjectId);
+            const year = calCurrentDate.getFullYear();
+            const month = calCurrentDate.getMonth();
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.getElementById('calendar-days');
+            grid.innerHTML = '';
+
+            // Empty slots
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="day-cell empty"></div>`;
+            }
+
+            // Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateObj = new Date(year, month, i);
+                const dayOfWeek = dateObj.getDay();
+
+                // Format YYYY-MM-DD local
+                const yyyy = year;
+                const mm = String(month + 1).padStart(2, '0');
+                const dd = String(i).padStart(2, '0');
+                const dateStr = `${yyyy}-${mm}-${dd}`;
+
+                let cellClass = 'day-cell';
+                if (dayOfWeek === 6) cellClass += ' saturday';
+                if (sub.tutoDates.includes(dateStr)) cellClass += ' tutoria';
+                if (sub.examDate === dateStr) cellClass += ' examen';
+
+                grid.innerHTML += `<div class="${cellClass}">${i}</div>`;
+            }
+        }
+
+        document.getElementById('cal-prev').addEventListener('click', () => {
+            calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('cal-next').addEventListener('click', () => {
+            calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+
+</html>
